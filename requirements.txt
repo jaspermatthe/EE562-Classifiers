@@ -1,2 +1,7 @@
 torch
 torchvision
+matplotlib
+numpy
+seaborn
+scikit-learn
+tqdm
