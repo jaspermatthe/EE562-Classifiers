@@ -1,10 +1,15 @@
 import torch
 import torch.nn as nn  
 import torch.optim as optim  
-from torch.utils.data import DataLoader
-from torchvision import transforms, models  
-import numpy as np  
+from torchvision import models  
+import sys
 from tqdm import tqdm 
+import numpy as np
+project_root = "/Users/cindychen/Desktop/EE562/EE562 Assignments/EE562-Classifiers"
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
+from src.datasets.doggie_loader import get_doggie_datasets, create_dataloaders
 
 # ResNet-18 Classifier 
 class ResNetClassifier(nn.Module):
@@ -29,39 +34,9 @@ def create_resnet18(num_classes):
     model = ResNetClassifier(num_classes=num_classes) # num classes are the number of output classes
     return model
 
-# defining the default data transformations for training and validation.
-def get_default_transforms():
-    # training transforms will be different from validation transforms, because we're applying data augmentation on training transforms.
-    train_transform = transforms.Compose([
-        transforms.Resize((224, 224)),# Resize to 224x224 as expected by resnet-18
-        transforms.RandomHorizontalFlip(p=0.5), # randomly flip the images horizontally with a 50% chance
-        transforms.RandomRotation(15), # randomly rotating images by up to 15 degrees
-        transforms.ColorJitter( # randomly changing the brightness, contrast and saturation of the images.
-            brightness=0.2, 
-            contrast=0.2, 
-            saturation=0.2
-        ),
-        transforms.ToTensor(),
-        transforms.Normalize( # normalization with imagenet statistics
-            mean=[0.485, 0.456, 0.406],  # RGB means from ImageNet
-            std=[0.229, 0.224, 0.225]     # RGB stds from ImageNet
-        )
-    ])
-    
-    # we want to evaluate on clean, unmodified images to get true performance, so val doesn't have augmentation
-    val_transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(
-            mean=[0.485, 0.456, 0.406],
-            std=[0.229, 0.224, 0.225]
-        )
-    ])
-    
-    return train_transform, val_transform
 
 # training model for one epoch, this function will be called in a looop for multiple epochs
-def train_epoch(model, train_loader, criterion, optimizer):
+def train_epoch(model, train_loader, criterion, optimizer, device='cpu'):
     model.train() # model set to training mode
     # Initialize accumulators for loss and accuracy
     running_loss = 0.0 
