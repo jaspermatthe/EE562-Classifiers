@@ -9,8 +9,7 @@ project_root = "/Users/cindychen/Desktop/EE562/EE562 Assignments/EE562-Classifie
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-from src.datasets.doggie_loader import get_doggie_datasets, create_dataloaders
-
+from src.datasets.doggie_loader import get_doggie_dataset, create_doggie_dataloaders, get_default_transforms
 # ResNet-18 Classifier 
 class ResNetClassifier(nn.Module):
     def __init__(self, num_classes):
