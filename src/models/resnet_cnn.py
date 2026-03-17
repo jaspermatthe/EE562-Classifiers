@@ -10,11 +10,11 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 
 from src.datasets.doggie_loader import get_doggie_dataset, create_doggie_dataloaders, get_default_transforms
-# ResNet-18 Classifier 
+# resnet-18 classifier
 class ResNetClassifier(nn.Module):
     def __init__(self, num_classes):
         super(ResNetClassifier, self).__init__()
-        self.backbone = models.resnet18(weights=None) # Resnet-18 architecture with random weights (not pretrained)
+        self.backbone = models.resnet18(weights=None) # architecture with random weights (not pretrained)
         num_features = self.backbone.fc.in_features # getting the number of input features to the original fully connected layer, 
         # we need this number to connect our new classifier head, because this one is assuming the same number of input features as the original ResNet-18, which is 512. 
         self.backbone.fc = nn.Sequential( #the original classifier is designed for 1000 ImageNet classes, we need to adapt it to our specific datasets.
@@ -92,7 +92,7 @@ def validate_epoch(model, val_loader, criterion):
     
     return epoch_loss, epoch_acc
 
-# prediction function for a single image
+# prediction function for a single image as an example in the report
 def predict_image(image_path, model, class_names, transform):
     from PIL import Image
     model.eval()

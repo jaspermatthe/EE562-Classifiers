@@ -46,28 +46,70 @@ def split_stanford_dogs(source="/Users/cindychen/Desktop/EE562/EE562 Assignments
     print(f"\nDataset split complete! Files saved to: {output}")
     return output
 
-# defining the default data transformations for training and validation.
+# # defining the default data transformations for training and validation.
+# def get_default_transforms():
+#     # training transforms will be different from validation transforms, because we're applying data augmentation on training transforms.
+#     train_transform = transforms.Compose([
+#         transforms.Resize((224, 224)),# Resize to 224x224 as expected by resnet-18
+#         transforms.RandomHorizontalFlip(p=0.5), # randomly flip the images horizontally with a 50% chance
+#         transforms.RandomRotation(15), # randomly rotating images by up to 15 degrees
+#         transforms.ColorJitter( # randomly changing the brightness, contrast and saturation of the images.
+#             brightness=0.2, 
+#             contrast=0.2, 
+#             saturation=0.2
+#         ),
+#         transforms.ToTensor(),
+#         transforms.Normalize( # normalization with imagenet statistics
+#             mean=[0.485, 0.456, 0.406],  # RGB means from ImageNet
+#             std=[0.229, 0.224, 0.225]     # RGB stds from ImageNet
+#         )
+#     ])
+    
+#     # we want to evaluate on clean, unmodified images to get true performance, so val doesn't have augmentation
+#     val_transform = transforms.Compose([
+#         transforms.Resize((224, 224)),
+#         transforms.ToTensor(),
+#         transforms.Normalize(
+#             mean=[0.485, 0.456, 0.406],
+#             std=[0.229, 0.224, 0.225]
+#         )
+#     ])
+    
+#     return train_transform, val_transform
+
+# more aggresssive data augmentation for training, to help the model generalize better given the small dataset size, and to make it more robust to variations in the images.
 def get_default_transforms():
-    # training transforms will be different from validation transforms, because we're applying data augmentation on training transforms.
     train_transform = transforms.Compose([
-        transforms.Resize((224, 224)),# Resize to 224x224 as expected by resnet-18
-        transforms.RandomHorizontalFlip(p=0.5), # randomly flip the images horizontally with a 50% chance
-        transforms.RandomRotation(15), # randomly rotating images by up to 15 degrees
-        transforms.ColorJitter( # randomly changing the brightness, contrast and saturation of the images.
-            brightness=0.2, 
-            contrast=0.2, 
-            saturation=0.2
+        transforms.Resize((256, 256)),  # Resize slightly larger then crop
+        transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),  # Random scale and crop
+        transforms.RandomHorizontalFlip(p=0.5),
+        transforms.RandomRotation(degrees=(-30, 30)),  # Increased rotation range
+        transforms.ColorJitter(  # More aggressive color jitter
+            brightness=0.3, 
+            contrast=0.3, 
+            saturation=0.3,
+            hue=0.1  # Added hue jitter
         ),
+        transforms.RandomAffine(  # NEW: Random affine transformations
+            degrees=0,  # Already using rotation above
+            translate=(0.1, 0.1),  # Random shift up to 10%
+            scale=(0.9, 1.1),  # Random scaling
+            shear=10  # Random shear
+        ),
+        transforms.GaussianBlur(kernel_size=(5, 9), sigma=(0.1, 5)),  # NEW: Random blur
+        transforms.RandomAdjustSharpness(sharpness_factor=2, p=0.3),  # NEW: Random sharpness
         transforms.ToTensor(),
-        transforms.Normalize( # normalization with imagenet statistics
-            mean=[0.485, 0.456, 0.406],  # RGB means from ImageNet
-            std=[0.229, 0.224, 0.225]     # RGB stds from ImageNet
+        transforms.RandomErasing(p=0.2, scale=(0.02, 0.1)),  # NEW: Cutout regularization
+        transforms.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225]
         )
     ])
     
-    # we want to evaluate on clean, unmodified images to get true performance, so val doesn't have augmentation
+    # VALIDATION/TEST TRANSFORMS - Keep simple
     val_transform = transforms.Compose([
-        transforms.Resize((224, 224)),
+        transforms.Resize((256, 256)),
+        transforms.CenterCrop(224),  # Center crop instead of direct resize
         transforms.ToTensor(),
         transforms.Normalize(
             mean=[0.485, 0.456, 0.406],
