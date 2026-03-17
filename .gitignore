@@ -12,5 +12,3 @@ notebooks/doggie_checkpoints/
 # Do not ignore notebooks or Python scripts
 !notebooks/*.ipynb
 !notebooks/*.py
-/Users/jaspermatthe/Library/CloudStorage/OneDrive-UW/Documents/USA/UW/Courses/WIN26/EE562/EE562-Classifiers/notebooks/model_comparison.ipynb
-/Users/jaspermatthe/Library/CloudStorage/OneDrive-UW/Documents/USA/UW/Courses/WIN26/EE562/EE562-Classifiers/notebooks/road_surface_classifier.ipynb
