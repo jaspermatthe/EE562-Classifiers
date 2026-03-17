@@ -3,3 +3,12 @@ outputs/
 __pycache__/
 *.pth
 .ipynb_checkpoints/
+
+# Ignore all non-notebook/code and output files in notebooks/
+notebooks/*.pth
+notebooks/*.json
+notebooks/*.png
+notebooks/doggie_checkpoints/
+# Do not ignore notebooks or Python scripts
+!notebooks/*.ipynb
+!notebooks/*.py
